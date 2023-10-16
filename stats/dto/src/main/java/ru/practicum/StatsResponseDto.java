@@ -11,8 +11,6 @@ import lombok.experimental.FieldDefaults;
 public class StatsResponseDto {
 
     String app;
-
     String uri;
-
     Long hits;
 }
