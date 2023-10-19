@@ -88,7 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findAll(PageRequest.of(from / size, size)).getContent()
                 .stream().map(CategoryDtoMapper::mapCategoryToDto).collect(Collectors.toList());
 
-        }
+    }
 
     @Override
     @Transactional
