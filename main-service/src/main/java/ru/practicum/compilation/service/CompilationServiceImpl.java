@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.compilation.dto.CompilationDto;
@@ -21,6 +22,7 @@ import ru.practicum.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -75,9 +77,9 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public List<CompilationDto> getAll(String pinned, Integer from, Integer size) {
+    public List<CompilationDto> getAll(String pinned, Pageable page) {
         log.info("Получение подборок событий");
-        List<Compilation> compilations = getCompilationsByPinned(pinned, from, size);
+        List<Compilation> compilations = getCompilationsByPinned(pinned, page);
         List<CompilationDto> compilationDtos = compileDtosWithEvents(compilations);
         return compilationDtos;
     }
@@ -120,24 +122,21 @@ public class CompilationServiceImpl implements CompilationService {
         return compilationRepository.save(compilation);
     }
 
-    private List<Compilation> getCompilationsByPinned(String pinned, Integer from, Integer size) {
+    private List<Compilation> getCompilationsByPinned(String pinned, Pageable page) {
         List<Compilation> compilations;
         if (pinned.isEmpty()) {
-            compilations = compilationRepository.findAll(PageRequest.of(from / size, size)).getContent();
+            compilations = compilationRepository.findAll(page).getContent();
         } else {
-            Boolean pin = Boolean.parseBoolean(pinned);
-            compilations = compilationRepository.findAllByPinned(pin, PageRequest.of(from / size, size));
+            compilations = compilationRepository.findAllByPinned(Boolean.valueOf(pinned), page);
         }
         return compilations;
     }
 
     private List<CompilationDto> compileDtosWithEvents(List<Compilation> compilations) {
         List<CompilationDto> compilationDtos = new ArrayList<>();
-        for (Compilation compilation : compilations) {
-            CompilationDto cdto = compileDtoWithEvents(compilation);
-            compilationDtos.add(cdto);
-        }
-        return compilationDtos;
+        return compilations.stream()
+                .map(this::compileDtoWithEvents)
+                .collect(Collectors.toList());
     }
 
     private CompilationDto compileDtoWithEvents(Compilation compilation) {

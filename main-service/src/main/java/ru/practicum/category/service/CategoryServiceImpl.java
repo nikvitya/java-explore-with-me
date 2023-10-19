@@ -85,12 +85,10 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto> getAll(Integer from, Integer size) {
         log.info(CATEGORY_GETTING_ALL);
 
-        List<Category> categories = categoryRepository.findAll(PageRequest.of(from / size, size)).getContent();
+        return categoryRepository.findAll(PageRequest.of(from / size, size)).getContent()
+                .stream().map(CategoryDtoMapper::mapCategoryToDto).collect(Collectors.toList());
 
-        List<CategoryDto> categoriesDtos = categories.stream().map(CategoryDtoMapper::mapCategoryToDto).collect(Collectors.toList());
-
-        return categoriesDtos;
-    }
+        }
 
     @Override
     @Transactional

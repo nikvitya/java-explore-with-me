@@ -51,34 +51,43 @@ public class RequestServiceImpl implements RequestService {
         log.info("Изменение статуса заявок на участие в событии пользователя {}", userId);
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
+
         Event event = getEventById(eventId);
+
         List<ParticipationRequest> requests = getParticipationRequestsByEventId(eventId);
         Long confirmedRequestsCounter = requests.stream().filter(r -> r.getStatus().equals("CONFIRMED")).count();
+
         List<ParticipationRequest> result = new ArrayList<>();
+
         for (ParticipationRequest request : requests) {
             if (request.getStatus().equals("CONFIRMED") || request.getStatus().equals("REJECTED") || request.getStatus().equals("PENDING")) {
+
                 if (updateRequest.getStatus().equals("CONFIRMED") && event.getParticipantLimit() != 0) {
                     if (event.getParticipantLimit() < confirmedRequestsCounter) {
-                        List<ParticipationRequest> pending = requestRepository.findRequestByEventIdAndStatus(event.getId(), "PENDING").stream()
-                                .peek(p -> p.setStatus("REJECTED"))
-                                .collect(Collectors.toList());
+                        List<ParticipationRequest> pending = requestRepository.findRequestByEventIdAndStatus(event.getId(), "PENDING")
+                                .stream().peek(p -> p.setStatus("REJECTED")).collect(Collectors.toList());
                         requestRepository.saveAll(pending);
                         log.info("Слишком много заявок на участие");
                         throw new ConflictException("Слишком много заявок на участие");
                     }
                 }
+
                 if (updateRequest.getStatus().equals("REJECTED") && request.getStatus().equals("CONFIRMED")) {
                     throw new ConflictException("Нельзя отменять подтверждённую заявку");
                 }
+
                 request.setStatus(updateRequest.getStatus());
                 ParticipationRequestDto participationRequestDto = requestDtoMapper.mapRequestToDto(request);
+
                 if ("CONFIRMED".equals(participationRequestDto.getStatus())) {
                     confirmedRequests.add(participationRequestDto);
                 } else if ("REJECTED".equals(participationRequestDto.getStatus())) {
                     rejectedRequests.add(participationRequestDto);
                 }
+
                 result.add(request);
                 confirmedRequestsCounter++;
+
             } else {
                 throw new WrongDataException("Неверный статус");
             }

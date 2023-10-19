@@ -17,8 +17,9 @@ import ru.practicum.user.dto.UserDtoMapper;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -41,24 +42,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> get(List<Long> ids, Integer from, Integer size) {
+    public List<UserDto> get(List<Long> ids, Pageable page) {
         log.info("Получение информации о пользователях");
-        List<UserDto> userDtos = new ArrayList<>();
-        Pageable pageable = PageRequest.of(from / size, size);
 
         if (ids == null) {
-            List<User> users = userRepository.findAllPageable(pageable);
-            for (User user : users) {
-                userDtos.add(UserDtoMapper.mapUserToDto(user));
-            }
-        } else {
-            List<User> users = userRepository.findAllByIdsPageable(ids, pageable);
-            for (User user : users) {
-                userDtos.add(UserDtoMapper.mapUserToDto(user));
-            }
-        }
+            return userRepository.findAllPageable(page).stream()
+                    .map(UserDtoMapper::mapUserToDto)
+                    .collect(Collectors.toList());
 
-        return userDtos;
+        } else {
+            return userRepository.findAllByIdsPageable(ids, page).stream()
+                    .map(UserDtoMapper::mapUserToDto)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override

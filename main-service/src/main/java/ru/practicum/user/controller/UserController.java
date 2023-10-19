@@ -3,6 +3,7 @@ package ru.practicum.user.controller;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.user.dto.NewUserRequest;
@@ -24,7 +25,7 @@ public class UserController {
     public List<UserDto> get(@RequestParam(required = false) List<Long> ids,
                              @RequestParam(required = false, defaultValue = "0") Integer from,
                              @RequestParam(required = false, defaultValue = "10") Integer size) {
-        return userService.get(ids, from, size);
+        return userService.get(ids, PageRequest.of(from / size, size));
     }
 
     @PostMapping
