@@ -132,7 +132,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     private List<CompilationDto> compileDtosWithEvents(List<Compilation> compilations) {
-        List<CompilationDto> compilationDtos = new ArrayList<>();
+
         return compilations.stream()
                 .map(this::compileDtoWithEvents)
                 .collect(Collectors.toList());
