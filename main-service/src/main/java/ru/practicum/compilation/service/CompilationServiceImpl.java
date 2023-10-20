@@ -122,9 +122,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     private List<Compilation> getCompilationsByPinned(Boolean pinned, Pageable page) {
-
       return compilationRepository.findAllByPinned(pinned, page);
-
     }
 
     private List<CompilationDto> compileDtosWithEvents(List<Compilation> compilations) {
