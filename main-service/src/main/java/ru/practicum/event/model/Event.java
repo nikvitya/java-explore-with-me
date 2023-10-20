@@ -34,7 +34,7 @@ public class Event {
 
     EventState state;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinTable(name = "events_to_categories",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
@@ -46,10 +46,10 @@ public class Event {
     @Column(nullable = false, name = "event_date")
     LocalDateTime eventDate;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     User initiator;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     Location location;
 
     @Column
@@ -64,7 +64,7 @@ public class Event {
     @Column(name = "request_moderation")
     Boolean requestModeration;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "events_to_compilations",
             joinColumns = @JoinColumn(name = "compilation_id"),
             inverseJoinColumns = @JoinColumn(name = "event_id"))
