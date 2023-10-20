@@ -76,7 +76,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public List<CompilationDto> getAll(String pinned, Pageable page) {
+    public List<CompilationDto> getAll(Boolean pinned, Pageable page) {
         log.info("Получение подборок событий");
         List<Compilation> compilations = getCompilationsByPinned(pinned, page);
         List<CompilationDto> compilationDtos = compileDtosWithEvents(compilations);
@@ -121,14 +121,10 @@ public class CompilationServiceImpl implements CompilationService {
         return compilationRepository.save(compilation);
     }
 
-    private List<Compilation> getCompilationsByPinned(String pinned, Pageable page) {
-        List<Compilation> compilations;
-        if (pinned.isEmpty()) {
-            compilations = compilationRepository.findAll(page).getContent();
-        } else {
-            compilations = compilationRepository.findAllByPinned(Boolean.valueOf(pinned), page);
-        }
-        return compilations;
+    private List<Compilation> getCompilationsByPinned(Boolean pinned, Pageable page) {
+
+      return compilationRepository.findAllByPinned(pinned, page);
+
     }
 
     private List<CompilationDto> compileDtosWithEvents(List<Compilation> compilations) {

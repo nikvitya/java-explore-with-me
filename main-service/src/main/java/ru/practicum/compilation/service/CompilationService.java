@@ -13,7 +13,7 @@ public interface CompilationService {
 
     CompilationDto update(Long compId, UpdateCompilationRequest compilationDto);
 
-    List<CompilationDto> getAll(String pinned, Pageable page);
+    List<CompilationDto> getAll(Boolean pinned, Pageable page);
 
     CompilationDto getCompilationById(Long compId);
 

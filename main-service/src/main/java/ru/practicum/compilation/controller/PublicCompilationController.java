@@ -19,7 +19,7 @@ public class PublicCompilationController {
     final CompilationService compilationService;
 
     @GetMapping
-    public List<CompilationDto> getAll(@RequestParam(defaultValue = "") String pinned,
+    public List<CompilationDto> getAll(@RequestParam(required = false) Boolean pinned,
                                        @RequestParam(defaultValue = "0") Integer from,
                                        @RequestParam(defaultValue = "10") Integer size) {
         return compilationService.getAll(pinned, PageRequest.of(from / size, size));

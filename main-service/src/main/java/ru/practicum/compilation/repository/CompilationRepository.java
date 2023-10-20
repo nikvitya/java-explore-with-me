@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface CompilationRepository extends JpaRepository<Compilation, Long> {
 
+    @Query("select c from Compilation c where (:pinned is null or c.pinned = :pinned)")
     List<Compilation> findAllByPinned(Boolean pinned, Pageable page);
 
     @Transactional
