@@ -12,14 +12,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countByName(String name);
 
     @Query("SELECT u FROM User u " +
-            "WHERE u.id IN :ids")
+            "WHERE(:ids IS NULL OR u.id IN :ids)")
     List<User> findAllByIdsPageable(List<Long> ids, Pageable page);
-
-    @Query("SELECT u FROM User u")
-    List<User> findAllPageable(Pageable page);
 
     @Query("SELECT u FROM User u " +
             "WHERE u.name = :name")
     List<User> findByName(String name);
-
 }

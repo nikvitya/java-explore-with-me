@@ -43,16 +43,10 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> get(List<Long> ids, Pageable page) {
         log.info("Получение информации о пользователях");
 
-        if (ids == null) {
-            return userRepository.findAllPageable(page).stream()
-                    .map(UserDtoMapper::mapUserToDto)
-                    .collect(Collectors.toList());
+        return userRepository.findAllByIdsPageable(ids, page).stream()
+                .map(UserDtoMapper::mapUserToDto)
+                .collect(Collectors.toList());
 
-        } else {
-            return userRepository.findAllByIdsPageable(ids, page).stream()
-                    .map(UserDtoMapper::mapUserToDto)
-                    .collect(Collectors.toList());
-        }
     }
 
     @Override
