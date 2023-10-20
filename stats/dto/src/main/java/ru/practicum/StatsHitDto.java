@@ -22,7 +22,6 @@ public class StatsHitDto {
     @NotBlank
     String uri;
 
-    @NotBlank
     String ip;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
