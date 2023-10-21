@@ -109,7 +109,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<ParticipationRequestDto> getParticipationRequestsByUserId(Long userId) {
         log.info("Получение информации о заявках пользователя..");
-        if (!userService.isUserExistById(userId)){
+        if (!userService.isUserExistById(userId)) {
             throw new NotFoundException("Пользователь с id={} не найден", userId);
         }
         return requestRepository.findByUserId(userId).stream()
@@ -211,6 +211,4 @@ public class RequestServiceImpl implements RequestService {
         return eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Событие не найдено"));
     }
-
-
 }
