@@ -1,6 +1,5 @@
 package ru.practicum.comments.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.event.model.Event;
@@ -8,8 +7,6 @@ import ru.practicum.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
-import static ru.practicum.util.JsonFormatPattern.JSON_FORMAT_PATTERN_FOR_TIME;
 
 @Entity
 @Table(name = "comments")
@@ -31,13 +28,10 @@ public class Comment {
     String state;
 
     @Column(nullable = false)
-    @JsonFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
     LocalDateTime created;
 
-    @JsonFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
     LocalDateTime published;
 
-    @JsonFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
     LocalDateTime updated;
 
     @ManyToOne(fetch = FetchType.LAZY)

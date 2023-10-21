@@ -58,23 +58,28 @@ public class RequestServiceImpl implements RequestService {
 
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
+
         List<ParticipationRequest> result = new ArrayList<>();
+
+        List<ParticipationRequest> pending = requests.stream()
+                .filter(p -> p.getStatus().equals(PENDING_REQUEST)).collect(Collectors.toList());
+
 
         for (ParticipationRequest request : requests) {
             if (request.getStatus().equals(CONFIRMED_REQUEST) || request.getStatus().equals(REJECTED_REQUEST) || request.getStatus().equals(PENDING_REQUEST)) {
 
                 if (updateRequest.getStatus().equals(CONFIRMED_REQUEST) && event.getParticipantLimit() != 0) {
                     if (event.getParticipantLimit() < confirmedRequestsCounter) {
-                        List<ParticipationRequest> pending = requestRepository.findRequestByEventIdAndStatus(event.getId(), PENDING_REQUEST)
-                                .stream().peek(p -> p.setStatus(REJECTED_REQUEST)).collect(Collectors.toList());
-                        requestRepository.saveAll(pending);
+
+                        pending.stream().peek(p -> p.setStatus(REJECTED_REQUEST)).collect(Collectors.toList());
+
                         log.info("Слишком много заявок на участие");
                         throw new ConflictException("Слишком много заявок на участие");
                     }
                 }
 
                 if (updateRequest.getStatus().equals(REJECTED_REQUEST) && request.getStatus().equals(CONFIRMED_REQUEST)) {
-                    throw new ConflictException("Нельзя отменять подтверждённую заявку");
+                    throw new ConflictException("Нельзя отменять подтверждённую заявку через отсюда");
                 }
 
                 request.setStatus(updateRequest.getStatus());
@@ -93,14 +98,20 @@ public class RequestServiceImpl implements RequestService {
                 throw new WrongDataException("Неверный статус");
             }
         }
+
+        requestRepository.saveAll(pending);
+
         requestRepository.saveAll(result);
+
         return EventRequestStatusUpdateResultMapper.mapToEventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
     }
 
     @Override
     public List<ParticipationRequestDto> getParticipationRequestsByUserId(Long userId) {
         log.info("Получение информации о заявках пользователя..");
-        User user = userService.getUserById(userId);
+        if (!userService.isUserExistById(userId)){
+            throw new NotFoundException("Пользователь с id={} не найден", userId);
+        }
         return requestRepository.findByUserId(userId).stream()
                 .map(requestDtoMapper::mapRequestToDto)
                 .collect(Collectors.toList());
@@ -154,7 +165,11 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public ParticipationRequestDto cancel(Long userId, Long requestId) {
         log.info("Отмена пользователем {} своего запроса на участие в {}", userId, requestId);
-        User user = userService.getUserById(userId);
+
+        if (!userService.isUserExistById(userId)) {
+            throw new NotFoundException("Пользователь с id={} не найден", userId);
+        }
+
         ParticipationRequest request = requestRepository.findById(requestId).orElseThrow(
                 () -> new NotFoundException("Запрос не существует")
         );
@@ -185,8 +200,11 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private List<ParticipationRequest> getParticipationRequestsByEventId(Long eventId) {
-        Event event = getEventById(eventId);
-        return requestRepository.findByEventId(eventId);
+        if (eventRepository.existsById(eventId)) {
+            return requestRepository.findByEventId(eventId);
+        } else {
+            throw new NotFoundException("Событие не найдено");
+        }
     }
 
     private Event getEventById(Long eventId) {

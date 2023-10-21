@@ -37,7 +37,6 @@ public class CommentDto {
     @JsonFormat(pattern = JSON_FORMAT_PATTERN_FOR_TIME)
     LocalDateTime updated;
 
-
     UserShortDto author;
     EventShortDto event;
 

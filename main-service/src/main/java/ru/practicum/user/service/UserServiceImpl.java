@@ -63,5 +63,8 @@ public class UserServiceImpl implements UserService {
         log.info("Пользователь удалён");
     }
 
-
+    @Override
+    public Boolean isUserExistById(Long userId) {
+        return userRepository.existsById(userId);
+    }
 }

@@ -103,14 +103,12 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto update(Long userId, Long commentId, CommentDto updateCommentDto) {
         log.info("Изменение комментария c id = {} пользователем id= {}", commentId, userId);
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("Пользователь c id= {} не найден ", userId)
-        );
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("Пользователь c id= {} не найден", userId);
+        }
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new NotFoundException("Комментарий c id= {} не найден ", commentId));
-
-        //List<ParticipationRequest> participationRequests = requestRepository.findByUserId(userId);
 
         if (userId.equals(comment.getAuthor().getId())) {
             comment.setText(updateCommentDto.getText());
@@ -129,9 +127,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteByUser(Long userId, Long commentId) {
         log.info("Удаление комментария c id = {} пользователем id= {}", commentId, userId);
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("Пользователь c id= {} не найден", userId)
-        );
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("Пользователь c id= {} не найден", userId);
+        }
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new NotFoundException("Комментарий c id= {} не найден ", commentId)
         );
@@ -149,12 +147,11 @@ public class CommentServiceImpl implements CommentService {
     public void deleteByAdmin(Long commentId) {
         log.info("Удаление комментария администратором {}", commentId);
 
-        Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new NotFoundException("Комментарий c id = {} не найден ", commentId)
-        );
+        if (!commentRepository.existsById(commentId)) {
+            throw new NotFoundException("Комментарий c id = {} не найден ", commentId);
+        }
         commentRepository.deleteById(commentId);
         log.info("Комментарий с id= {} удален администратором", commentId);
-
     }
 
     @Override
@@ -186,6 +183,4 @@ public class CommentServiceImpl implements CommentService {
         comment.setEvent(event);
         return comment;
     }
-
-
 }
