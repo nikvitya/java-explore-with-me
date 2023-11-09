@@ -46,10 +46,10 @@ public class Event {
     @Column(nullable = false, name = "event_date")
     LocalDateTime eventDate;
 
-    @ManyToOne(optional = false,fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     User initiator;
 
-    @ManyToOne(optional = false,fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     Location location;
 
     @Column
